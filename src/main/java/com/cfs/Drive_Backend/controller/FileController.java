@@ -4,6 +4,7 @@ import com.cfs.Drive_Backend.entity.FileEntity;
 import com.cfs.Drive_Backend.entity.User;
 import com.cfs.Drive_Backend.services.FileServiceStorage;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -28,16 +29,25 @@ public class FileController {
 
     }
 
-
+    private User getLoggedUser(HttpSession session) {
+        return (User) session.getAttribute("user");
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file")MultipartFile file,
-                                             @RequestParam Long userId,
-                                             @RequestParam(value = "parentFolderId",required = false) Long parentFolderId)
+
+                                             @RequestParam(value = "parentFolderId",required = false) Long parentFolderId,
+                                             HttpSession session)
     {
+        User user= getLoggedUser(session);
+
+        if(user== null)
+        {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
         try
         {
-            String response=fileServiceStorage.saveFile(file,userId,parentFolderId);
+            String response=fileServiceStorage.saveFile(file,user.getId(),parentFolderId);
             return ResponseEntity.ok(response);
         }
         catch(Exception e)
@@ -48,11 +58,16 @@ public class FileController {
 
     @GetMapping("/download/{id}")
     public ResponseEntity<Resource>downloadFile(@PathVariable Long id,
-                                                @RequestParam Long userId)
+                                                HttpSession session)
     {
+        User user = getLoggedUser(session);
+        if(user==null)
+        {
+            return ResponseEntity.status(401).build();
+        }
         try{
             //mysql meta data use
-            FileEntity fileEntity = fileServiceStorage.getFileById(id,userId);
+            FileEntity fileEntity = fileServiceStorage.getFileById(id,user.getId());
             Path path = Paths.get(fileEntity.getPath());
             Resource resource= new UrlResource(path.toUri());
             return ResponseEntity.ok().header("content-Disposition","attachment; filename=\""+fileEntity.getName()+"\"")
@@ -63,19 +78,30 @@ public class FileController {
         }
     }
     @GetMapping("/list")
-    public ResponseEntity<List<FileEntity>> listfiles(
-            @RequestParam Long userId,
-            @RequestParam(value="parentFolderId", required=false) Long parentFolderId)
+    public ResponseEntity<?> listFiles(
+
+            @RequestParam(value="parentFolderId", required=false) Long parentFolderId,
+            HttpSession session)
     {
-        List<FileEntity> files = fileServiceStorage.getFilesInFolder(userId, parentFolderId);
+        User user = getLoggedUser(session);
+
+        if (user == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+        List<FileEntity> files = fileServiceStorage.getFilesInFolder(user.getId(), parentFolderId);
         return ResponseEntity.ok(files);
     }
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteFile(@PathVariable Long id,
-                                             @RequestParam Long userId)
+                                             HttpSession session)
     {
+        User user = getLoggedUser(session);
+
+        if (user == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
         try{
-            fileServiceStorage.deleteById(id, userId);
+            fileServiceStorage.deleteById(id, user.getId());
             return ResponseEntity.ok("File deleted Successfully");
         }
         catch (Exception e)
