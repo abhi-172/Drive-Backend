@@ -1,93 +1,71 @@
-📁 Cloud File Storage System (Drive Backend)
+# 🚀 Drive Backend (Google Drive Clone)
 
-A backend application similar to Google Drive that allows users to upload, store, manage, and retrieve files with secure access control using Spring Boot.
+A Spring Boot backend application that provides secure file storage functionality similar to Google Drive.
 
-🚀 Features..............
+## ✨ Features
+- 🔐 Session-based Authentication
+- 📁 File Upload & Download
+- 🛡️ Spring Security Integration
+- 📦 RESTful APIs
 
-📤 Upload files with user association
-📥 Download files securely
-🗂️ Organize files using folder structure
-🗑️ Delete files from storage and database
-🔐 User-based access control (only owner can access files)
-📊 Store file metadata (name, size, path, created time)
+## 🛠️ Tech Stack
+- Java
+- Spring Boot
+- Spring Security
+- Maven
 
-🛠️ Tech Stack.............
+## 📂 Project Structure
+controller → API endpoints  
+service → business logic  
+repo → database access  
+entity → database models  
 
-Backend: Java, Spring Boot
-Database: MySQL
-ORM: Spring Data JPA
-File Handling: Java NIO (Files API)
-API: REST APIs
-📂 Project Structure
-Drive_Backend/
-│── controller/
-│   └── FileController.java
-│── services/
-│   └── FileServiceStorage.java
-│── entity/
-│   ├── FileEntity.java
-│   └── User.java
-│── repo/
-│   ├── FileRepository.java
-│   └── UserRepository.java
+com.cfs.drive_backend
+│
+├── config
+│ └── SecurityConfig
+│
+├── controller
+│ ├── AuthController
+│ └── FileController
+│
+├── service
+│ ├── UserService
+│ └── FileService
+│
+├── repository
+│ ├── UserRepository
+│ └── FileRepository
+│
+├── entity
+│ ├── User
+│ └── FileEntity
+│
+├── security
+│ └── PasswordConfig
+│
+└── dto
+ ├── LoginRequest
+ └── RegisterRequest
 
-⚙️ API Endpoints.................
+## 📬 API Endpoints
 
-📌 1. Upload File
+### Auth
+- POST `/api/user/register`
+- POST `/api/user/login`
 
-POST /api/files/upload
+### Files
+- POST `/api/files/upload`
+- GET `/api/files/download`
+- GET `/api/files/download/{id}`
+- GET `/api/files/list`
+- DELETE `/api/files/delete/{id}`
 
-Request:
 
-Form-data →
-file (file to upload)
-userId
-parentFolderId (optional)
+## ▶️ Run Locally
+```bash
+mvn spring-boot:run
 
-Response:
-
-"File uploaded Successfully"
-📌 2. Download File
-
-GET /api/files/download/{id}
-
-Params:
-
-userId
-
-Response:
-
-Returns file as downloadable resource
-📌 3. List Files
-
-GET /api/files/list
-
-Params:
-
-userId
-parentFolderId (optional)
-
-Response:
-
-[
-  {
-    "id": 1,
-    "name": "file.pdf",
-    "size": 12345,
-    "type": "file"
-  }
-]
-📌 4. Delete File
-
-DELETE /api/files/delete/{id}
-
-Params:
-
-userId
-
-Response:
-
-"File deleted Successfully"
 
 ⚡ How It Works...............
 
@@ -115,7 +93,7 @@ Server runs at:..................
 ✔ Efficient file handling using Java NIO
 ✔ Scalable backend design using Spring Boot
 🚀 Future Improvements
-🔐 Add JWT Authentication (login/signup)
+🔐 Session Based Authentication (login/signup)
 ☁️ Integrate AWS S3 for cloud storage
 🔗 File sharing via public/private links
 📊 Dashboard for file management
@@ -128,3 +106,5 @@ Abhiraj Kumar
 ⭐ Support
 
 If you like this project, give it a ⭐ on GitHub!
+
+
